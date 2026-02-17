@@ -1,5 +1,7 @@
 # Arquitetura do Sistema BilheteriaTech
 
+> **Documentação principal** (rodar local, build e deploy AWS): [README.md](README.md)
+
 ## Visão Geral
 
 Sistema de bilheteria completo com arquitetura de monorepo, separando frontend (cliente e admin), backend API e serviços auxiliares.

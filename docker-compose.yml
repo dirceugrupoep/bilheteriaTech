@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bilheteriatech-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bilheteriatech
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./services/api
+      dockerfile: Dockerfile.dev
+    container_name: bilheteriatech-api
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/bilheteriatech?schema=public
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-long-random-string}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-change-me-in-production-use-long-random-string}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-change-me-in-production-use-long-random-string}
+      PAYMENT_MOCK_URL: http://payment-mock:4000
+      API_BASE_URL: http://localhost:3000
+      NODE_ENV: development
+      PORT: 3000
+      CORS_ORIGIN: http://localhost:5173,http://localhost:5174
+      QUEUE_TYPE: ${QUEUE_TYPE:-rabbitmq}
+      RABBITMQ_URL: amqp://admin:admin123@rabbitmq:5672
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./services/api:/app
+      - /app/node_modules
+
+  payment-mock:
+    build:
+      context: ./services/payment-provider-mock
+      dockerfile: Dockerfile
+    container_name: bilheteriatech-payment-mock
+    environment:
+      PORT: 4000
+      NODE_ENV: development
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./services/payment-provider-mock:/app
+      - /app/node_modules
+    command: npm run dev
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile.dev
+    container_name: bilheteriatech-web
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+    command: npm run dev
+
+  admin:
+    build:
+      context: ./apps/admin
+      dockerfile: Dockerfile.dev
+    container_name: bilheteriatech-admin
+    ports:
+      - "5174:5174"
+    depends_on:
+      - api
+    environment:
+      VITE_API_BASE_URL: http://localhost:3000
+    volumes:
+      - ./apps/admin:/app
+      - /app/node_modules
+    command: npm run dev
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: bilheteriatech-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: bilheteriatech-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

@@ -1,235 +1,342 @@
-# API Backend - BilheteriaTech
+# BilheteriaTech
 
-API REST do sistema de bilheteria. Responsável por autenticação, eventos, pedidos, pagamentos e integração com filas (RabbitMQ) e cache (Redis).
-
----
-
-## Stack
-
-| Tecnologia | Uso |
-|------------|-----|
-| **Node.js** | Runtime |
-| **TypeScript** | Linguagem |
-| **Express** | Framework HTTP |
-| **Prisma** | ORM |
-| **PostgreSQL** | Banco de dados |
-| **Zod** | Validação de entrada (DTOs) |
-| **JWT** | Autenticação |
-| **Bcrypt** | Hash de senhas |
-| **Pino** | Logging |
-| **Helmet** | Headers de segurança |
-| **RabbitMQ** (amqplib) | Fila de mensagens (webhooks) |
-| **Redis** (ioredis) | Cache e sessões |
+Sistema de bilheteria com site para o cliente (comprar ingressos), painel para o administrador (CRUD de eventos, pedidos, usuários) e API em Node.js. Toda a documentação de uso, execução local e deploy está neste arquivo e nos links ao final.
 
 ---
 
-## Como rodar
+## O que este projeto contém
 
-O projeto é executado via Docker. Na **raiz do monorepo**:
+- **Site do cliente** (`apps/web`): listar eventos, cadastrar, login, comprar ingresso (pagamento simulado), ver meus pedidos.
+- **Painel admin** (`apps/admin`): login admin, dashboard, CRUD de eventos, lista de pedidos e usuários.
+- **API** (`services/api`): autenticação (JWT), eventos, pedidos, pagamentos fake e webhook; usa PostgreSQL, RabbitMQ e Redis.
+- **Mock de pagamento** (`services/payment-provider-mock`): simula gateway e dispara webhook para a API.
+
+Tudo roda em containers Docker na sua máquina. Na AWS, cada parte é implantada em serviços separados (RDS, EC2, S3, CloudFront, etc.).
+
+---
+
+## Estrutura do repositório
+
+```
+bilheteriaTech/
+├── README.md                 ← Você está aqui. Documentação principal (local + AWS).
+├── QUICKSTART.md             ← Resumo rápido: subir com Docker e testar.
+├── ARCHITECTURE.md           ← Visão geral do sistema, componentes e fluxos.
+├── .env.example              ← Modelo de variáveis de ambiente (copie para .env).
+├── .env                      ← Suas variáveis (não vai pro Git). Crie a partir do .env.example.
+├── docker-compose.yml        ← Orquestra todos os serviços no seu PC (local).
+│
+├── apps/
+│   ├── web/                  ← Frontend cliente (React + Vite).
+│   │   ├── Dockerfile        ← Build de produção (Nginx).
+│   │   └── Dockerfile.dev    ← Desenvolvimento (npm run dev). Usado pelo docker-compose.
+│   └── admin/                ← Frontend admin (React + Vite).
+│       ├── Dockerfile
+│       └── Dockerfile.dev
+│
+├── services/
+│   ├── api/                  ← Backend (Node + Express + Prisma).
+│   │   ├── Dockerfile        ← Build de produção da API.
+│   │   ├── Dockerfile.dev    ← Desenvolvimento (migrate + seed + npm run dev). Usado pelo docker-compose.
+│   │   ├── prisma/           ← Schema do banco, migrations e seed.
+│   │   └── ARCHITECTURE.md   ← Detalhes da arquitetura em camadas da API.
+│   └── payment-provider-mock/
+│       └── Dockerfile        ← Serviço que simula o gateway e chama o webhook.
+│
+├── docs/
+│   └── RABBITMQ_REDIS_SETUP.md   ← Configuração de RabbitMQ e Redis.
+│
+└── lambda/                   ← Função AWS Lambda (webhook), opcional.
+```
+
+---
+
+## Arquivos que fazem o “rodar” e o “deploy”
+
+| Arquivo | O que faz | Por que importa |
+|--------|-----------|------------------|
+| **docker-compose.yml** (raiz) | Define todos os serviços (postgres, api, payment-mock, web, admin, rabbitmq, redis) e como sobe juntos no seu computador. | É o único arquivo que você precisa para rodar tudo em ambiente local com um comando. |
+| **.env** (raiz) | Guarda senhas, URLs e configurações (banco, JWT, RabbitMQ, Redis, etc.). Não é commitado. | Sem ele (ou com valores errados), a API e os apps não conectam no banco nem nos serviços. |
+| **.env.example** (raiz) | Lista das variáveis necessárias com exemplos. | Serve de modelo: você copia para `.env` e ajusta (no local já pode vir preenchido). |
+| **Dockerfile** em cada app/serviço | Instruções para construir a imagem Docker daquele componente. | No local, o `docker-compose` usa os `Dockerfile.dev` (ou o `Dockerfile` do mock). Na AWS, você usa os `Dockerfile` de produção para build e deploy. |
+| **Dockerfile.dev** (api, web, admin) | Imagem pensada para desenvolvimento: código montado por volume, comando `npm run dev`. | Permite ver alterações sem reconstruir a imagem; usado só no ambiente local pelo `docker-compose`. |
+
+- **Local:** o que “faz” rodar é o `docker-compose.yml` + `.env` + os `Dockerfile`/`Dockerfile.dev` referenciados nele.
+- **AWS:** não se usa o `docker-compose` da raiz. O deploy é feito com outros arquivos/ferramentas (build das imagens, ECR, EC2, RDS, S3, CloudFront, etc.), conforme o passo a passo abaixo.
+
+---
+
+# Parte 1 — Rodar no seu computador (local)
+
+Objetivo: ter o sistema inteiro funcionando na sua máquina usando Docker. Não é necessário instalar Node, PostgreSQL ou RabbitMQ manualmente.
+
+---
+
+## Passo 1 — Instalar o Docker
+
+1. Acesse [https://www.docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop).
+2. Baixe e instale o **Docker Desktop** para o seu sistema (Windows, Mac ou Linux).
+3. Abra o Docker Desktop e espere ele iniciar (ícone na bandeja do sistema).
+4. Abra um terminal (PowerShell, CMD ou terminal do VS Code) e digite:
+   ```bash
+   docker --version
+   docker compose version
+   ```
+   Se os dois comandos mostrarem versão, está pronto.
+
+---
+
+## Passo 2 — Abrir a pasta do projeto
+
+No terminal, vá até a pasta do projeto (onde está o `docker-compose.yml`):
+
+```bash
+cd C:\projetos\bilheteriaTech
+```
+
+Troque `C:\projetos\bilheteriaTech` pelo caminho real da pasta no seu PC.
+
+---
+
+## Passo 3 — Configurar o arquivo de ambiente (.env)
+
+1. Na pasta raiz do projeto, veja se existe o arquivo **`.env`**.
+2. Se **não existir**, copie o modelo:
+   - Copie o arquivo **`.env.example`** e renomeie a cópia para **`.env`**.
+   - No Windows (PowerShell): `Copy-Item .env.example .env`
+   - No Linux/Mac: `cp .env.example .env`
+3. Se **já existir** um `.env` pronto para local, você pode deixar como está. Caso queira conferir:
+   - Abra o `.env` em um editor de texto.
+   - As variáveis devem apontar para os serviços que sobem no Docker (por exemplo `postgres`, `rabbitmq`, `redis` como host). O `.env.example` na raiz já traz exemplos para ambiente local.
+
+Sem o `.env` (ou com valores errados), a API pode falhar ao conectar no banco ou no RabbitMQ.
+
+---
+
+## Passo 4 — Subir todos os serviços com Docker
+
+Ainda na pasta raiz (onde está o `docker-compose.yml`), execute:
 
 ```bash
 docker compose up --build
 ```
 
-A API sobe na porta 3000; migrations e seed rodam no startup do container. Para passos completos, credenciais e troubleshooting, use a documentação na raiz:
+- **O que isso faz:** lê o `docker-compose.yml`, constrói as imagens que usam `Dockerfile`/`Dockerfile.dev` e sobe os containers (postgres, api, payment-mock, web, admin, rabbitmq, redis).
+- **Na primeira vez** pode demorar alguns minutos (download de imagens e instalação de dependências).
+- Deixe o terminal aberto; os logs de todos os serviços aparecem aí. Para parar: `Ctrl+C`.
 
-- **[QUICKSTART.md](QUICKSTART.md)** — como subir, acessar e testar o sistema
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** — visão geral do sistema, componentes e fluxos
-
-### Scripts (dentro do container ou local)
-
-Na pasta `services/api`:
-
-| Script | Descrição |
-|--------|-----------|
-| `npm run dev` | Sobe a API em modo watch (tsx) |
-| `npm run build` | Compila TypeScript para `dist/` |
-| `npm run start` | Roda a aplicação compilada |
-| `npm run prisma:generate` | Gera o Prisma Client |
-| `npm run prisma:migrate` | Executa migrations (dev) |
-| `npm run prisma:migrate:deploy` | Executa migrations (produção) |
-| `npm run prisma:seed` | Popula o banco (admin + eventos exemplo) |
-| `npm run prisma:studio` | Abre o Prisma Studio |
+Quando aparecerem mensagens indicando que a API e os frontends subiram (por exemplo “API rodando na porta 3000”), siga para o próximo passo.
 
 ---
 
-## Variáveis de ambiente
+## Passo 5 — Acessar as aplicações no navegador
 
-| Variável | Obrigatória | Descrição |
-|----------|-------------|-----------|
-| `DATABASE_URL` | Sim | URL PostgreSQL (ex: `postgresql://user:pass@host:5432/db`) |
-| `JWT_SECRET` | Sim | Secret para tokens de usuários |
-| `ADMIN_JWT_SECRET` | Sim | Secret para tokens de admin |
-| `WEBHOOK_SECRET` | Sim | Secret para assinatura HMAC dos webhooks |
-| `PAYMENT_MOCK_URL` | Sim | URL do serviço mock de pagamento |
-| `API_BASE_URL` | Não | URL base da API (default: `http://localhost:3000`) |
-| `NODE_ENV` | Não | `development` ou `production` |
-| `PORT` | Não | Porta do servidor (default: `3000`) |
-| `CORS_ORIGIN` | Não | Origens permitidas, separadas por vírgula |
-| `LOG_LEVEL` | Não | Nível de log (ex: `info`, `debug`) |
-| `QUEUE_TYPE` | Não | `rabbitmq` ou `direct` (default: `rabbitmq`) |
-| `RABBITMQ_URL` | Não* | URL do RabbitMQ (*obrigatório se `QUEUE_TYPE=rabbitmq`) |
-| `REDIS_URL` | Não | URL do Redis |
+Abra o navegador e acesse:
+
+| O quê | URL |
+|-------|-----|
+| Site do cliente | http://localhost:5173 |
+| Painel admin | http://localhost:5174 |
+| API (health) | http://localhost:3000/health |
+
+Se a API estiver ok, http://localhost:3000/health deve retornar algo como `{"status":"ok","timestamp":"..."}`.
 
 ---
 
-## Endpoints da API
+## Passo 6 — Credenciais para testar
 
-### Health
+**Admin (painel em http://localhost:5174):**
 
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | `/health` | Status da API |
+- E-mail: `admin@bilheteriatech.local`
+- Senha: `Admin@123`
 
-### Autenticação (`/auth`)
+**Cliente (site em http://localhost:5173):**  
+Cadastre um usuário pela própria tela de registro.
 
-| Método | Rota | Auth | Descrição |
-|--------|------|------|-----------|
-| POST | `/auth/register` | Não | Cadastro de cliente |
-| POST | `/auth/login` | Não | Login de cliente (rate limit: 5/15min) |
-| POST | `/auth/admin/login` | Não | Login de admin (rate limit: 5/15min) |
+**RabbitMQ (interface de gestão):**
 
-### Eventos (`/events`)
-
-| Método | Rota | Auth | Descrição |
-|--------|------|------|-----------|
-| GET | `/events` | Não | Lista eventos |
-| GET | `/events/:id` | Não | Detalhe do evento |
-| POST | `/events` | Admin | Criar evento |
-| PUT | `/events/:id` | Admin | Atualizar evento |
-| DELETE | `/events/:id` | Admin | Remover evento |
-
-### Pedidos (`/orders`)
-
-| Método | Rota | Auth | Descrição |
-|--------|------|------|-----------|
-| POST | `/orders` | User | Criar pedido |
-| GET | `/orders/me/orders` | User | Meus pedidos |
-| GET | `/orders/admin/orders` | Admin | Listar todos os pedidos |
-| GET | `/orders/:id` | User/Admin | Detalhe do pedido |
-
-### Pagamentos (`/payments`)
-
-| Método | Rota | Auth | Descrição |
-|--------|------|------|-----------|
-| POST | `/payments/fake` | User | Processar pagamento fake (cartão 4242...) |
-
-### Webhooks
-
-| Método | Rota | Auth | Descrição |
-|--------|------|------|-----------|
-| POST | `/webhooks/payment` | Assinatura HMAC | Recebe confirmação de pagamento (body raw para validação) |
-
-### Usuários (admin)
-
-| Método | Rota | Auth | Descrição |
-|--------|------|------|-----------|
-| GET | `/admin/users` | Admin | Listar usuários |
-
-### Autenticação nas requisições
-
-- Cliente/Admin: header `Authorization: Bearer <token>`
-- Webhook: header `x-signature` com HMAC SHA256 do body (raw)
+- URL: http://localhost:15672  
+- Usuário: `admin`  
+- Senha: `admin123`  
 
 ---
 
-## Modelos de dados (Prisma)
+## Passo 7 — Parar os serviços
 
-- **User**: id, name, email (unique), passwordHash, role (USER | ADMIN), createdAt
-- **Event**: id, title, description, date, priceCents, totalTickets, createdAt
-- **Order**: id, userId, eventId, quantity, amountCents, status (PENDING | PAID | CANCELLED), createdAt
-- **Payment**: id, orderId, provider, status (PENDING | PAID | FAILED), payload (JSON), createdAt
+No terminal onde rodou `docker compose up --build`, pressione **Ctrl+C**.  
+Para remover os containers e o volume do banco (voltar ao estado “zerado”):
 
-Relacionamentos: User → Order; Event → Order; Order → Payment.
-
----
-
-## Arquitetura
-
-A API segue uma arquitetura em camadas (Clean Architecture / Layered).
-
-### Estrutura de pastas
-
-```
-src/
-├── controllers/    # Apresentação HTTP: recebe request, valida com DTO, chama service, devolve response
-├── services/       # Lógica de negócio: orquestra repositories e regras
-├── repositories/   # Acesso a dados: encapsula Prisma (queries)
-├── dtos/           # Contratos de entrada/saída com Zod (validação + tipos)
-├── validators/     # Reexportam DTOs (compatibilidade)
-├── middlewares/    # auth, authenticateAdmin
-├── utils/          # jwt, webhook (HMAC)
-├── types/          # Tipos TypeScript (ex: RequestWithUser)
-├── config/         # env, logger, database
-└── routes/         # Definição das rotas por domínio
+```bash
+docker compose down -v
 ```
 
-### Fluxo de uma requisição
+---
 
-1. **Controller** — Valida o body/params com DTO (Zod), extrai usuário do JWT se necessário, chama o **Service**.
-2. **Service** — Aplica regras de negócio, usa **Repositories** para ler/escrever no banco, retorna dados para o controller.
-3. **Repository** — Executa operações Prisma e retorna entidades.
+## Resumo do fluxo local
 
-### Design patterns
+1. Docker instalado.  
+2. Pasta do projeto aberta no terminal.  
+3. Arquivo `.env` criado a partir do `.env.example` (se ainda não existir).  
+4. Comando: `docker compose up --build`.  
+5. Acessar Web (5173), Admin (5174) e API (3000) no navegador.  
 
-- **Repository**: abstração do acesso a dados (Prisma); facilita testes e troca de ORM.
-- **Service**: lógica de negócio em uma camada única; reutilizável.
-- **DTO (Zod)**: validação e tipo em um só lugar; contratos claros entre camadas.
-- **Dependency Injection**: repositories e serviços injetados por construtor (facilita mock em testes).
-
-### Integrações
-
-- **RabbitMQ**: publicação de webhooks na fila `webhook-payments` para processamento assíncrono pelo worker. Conexão e reconexão tratadas em `queue.service.ts`.
-- **Redis**: serviço de cache em `queue.service.ts` (createRedisService); uso opcional para cache de eventos/sessões.
+O único arquivo que “dispara” tudo localmente é o **docker-compose.yml**; ele usa os **Dockerfile**/ **Dockerfile.dev** de cada pasta e as variáveis do **.env**.
 
 ---
 
-## Segurança
+# Parte 2 — Build e deploy na AWS
 
-- **Senhas**: bcrypt (hash antes de persistir).
-- **JWT**: secrets separados para usuário e admin; token no header `Authorization: Bearer <token>`.
-- **Webhooks**: assinatura HMAC SHA256 do body raw com `WEBHOOK_SECRET`; validação em `utils/webhook.ts`.
-- **Rate limit**: 5 tentativas de login por 15 minutos (express-rate-limit).
-- **HTTP**: Helmet para headers seguros, CORS configurável por origem.
+Aqui o objetivo é colocar o sistema na nuvem AWS: banco em RDS, API (e opcionalmente o mock) em EC2, frontends em S3 + CloudFront. O **docker-compose.yml** da raiz **não é usado** na AWS; cada parte é implantada separadamente.
 
 ---
 
-## Como adicionar um novo recurso
+## Visão geral do que será criado na AWS
 
-1. **DTO** (`dtos/`): definir schema Zod para entrada (e saída se necessário).
-2. **Repository** (`repositories/`): métodos de leitura/escrita no banco (Prisma).
-3. **Service** (`services/`): regras de negócio, chamando o repository.
-4. **Controller** (`controllers/`): parse do body com DTO, chamada ao service, resposta HTTP.
-5. **Rotas** (`routes/`): registrar verbos e middlewares (authenticate / authenticateAdmin).
-
-Exemplo mínimo para um “produto”:
-
-- `dtos/product.dto.ts`: `CreateProductDTO`, `UpdateProductDTO`.
-- `repositories/product.repository.ts`: `create`, `findById`, `findAll`, etc.
-- `services/product.service.ts`: `createProduct`, `getProduct`, etc.
-- `controllers/product.controller.ts`: funções que recebem `req`/`res`, validam com DTO e chamam o service.
-- `routes/product.routes.ts`: `router.post('/', authenticateAdmin, createProduct);` e afins.
-- Em `index.ts`: `app.use('/products', productRoutes);`
+| Recurso AWS | Uso no BilheteriaTech |
+|-------------|------------------------|
+| **VPC e subnets** | Rede isolada para RDS, EC2, etc. |
+| **RDS (PostgreSQL)** | Banco de dados da API. |
+| **EC2** | Servidor onde rodam a API e o payment-mock (por exemplo com Docker ou Docker Compose só da API+mock). |
+| **S3** | Dois buckets: um para o build do site (web), outro para o build do admin. |
+| **CloudFront** | CDN em frente aos buckets; entrega o site e o admin com HTTPS. |
+| **IAM** | Usuário/role com permissões mínimas para deploy (EC2, S3, CloudFront, RDS se necessário). |
+| **Lambda** (opcional) | Função para processar webhook; pode ficar em paralelo ao processamento na API. |
 
 ---
 
-## Observabilidade
+## Passo 1 — Conta AWS e IAM
 
-- **Logs**: Pino (JSON em produção, pretty em dev).
-- **Health**: `GET /health` retorna `{ status: 'ok', timestamp }`.
+1. Entre no console da AWS e ative **MFA** na conta (recomendado).
+2. Crie um **usuário IAM** só para deploy (ex.: `bilheteriatech-deployer`).
+3. Crie uma **policy** com permissão mínima, por exemplo:
+   - S3: PutObject, GetObject, ListBucket (para os buckets dos frontends).
+   - CloudFront: CreateInvalidation (para invalidar cache após deploy).
+   - EC2: DescribeInstances, SendCommand (SSM) ou SSH, conforme você for usar.
+4. Atribua essa policy ao usuário.
+5. Crie uma **Access Key** para esse usuário e guarde o **Access Key ID** e o **Secret Access Key** em local seguro (por exemplo em segredos do GitHub Actions, se for usar CI/CD).
 
 ---
 
-## Documentação
+## Passo 2 — VPC e rede
 
-A documentação completa do projeto está na **raiz do monorepo**:
+1. No console AWS, vá em **VPC**.
+2. Crie uma **VPC** (ex.: `bilheteriaTech-vpc`) com um bloco CIDR, por exemplo `10.0.0.0/16`.
+3. Crie **subnets**:
+   - Duas **públicas** (ex.: `10.0.1.0/24` e `10.0.2.0/24`) para cargas que precisam de IP público.
+   - Duas **privadas** (ex.: `10.0.11.0/24` e `10.0.12.0/24`) para o RDS (e opcionalmente para a EC2, se quiser).
+4. Crie **Internet Gateway**, associe à VPC e configure **route tables** nas subnets públicas para usar esse gateway.
+5. Se a EC2 estiver em subnet privada, crie **NAT Gateway** em subnet pública e rotas nas subnets privadas para saída pela NAT.
 
-| Documento (raiz) | Descrição |
-|------------------|-----------|
-| [QUICKSTART.md](QUICKSTART.md) | Como subir com Docker, acessar as aplicações, credenciais e testar o fluxo |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Arquitetura do sistema, componentes, fluxos, segurança e variáveis de ambiente |
+---
 
-Outros arquivos de referência:
+## Passo 3 — RDS (PostgreSQL)
 
-- [docs/RABBITMQ_REDIS_SETUP.md](docs/RABBITMQ_REDIS_SETUP.md) — RabbitMQ e Redis
-- [ARCHITECTURE.md](ARCHITECTURE.md) (neste diretório) — arquitetura em camadas do backend
+1. No console AWS, abra **RDS** e crie um **banco PostgreSQL**.
+2. Escolha a **VPC** e as **subnets** (de preferência as privadas).
+3. Crie um **Security Group** para o RDS (ex.: `bilheteriatech-rds-sg`) e libere a porta **5432** apenas para o Security Group da EC2 (e da Lambda, se for usar). Não exponha 5432 para a internet.
+4. Crie o banco com usuário e senha fortes; anote a **URL de conexão** (host, porta, nome do banco). Exemplo: `postgresql://usuario:senha@seu-rds.region.rds.amazonaws.com:5432/bilheteriatech`.
+5. Recomendado: guardar usuário e senha no **AWS Systems Manager Parameter Store** (tipo SecureString) e usar na EC2 ou no CI/CD.
+
+---
+
+## Passo 4 — EC2 (API e payment-mock)
+
+1. Crie uma instância **EC2** (Amazon Linux 2 ou 2023, por exemplo).
+2. Associe à **VPC** e a uma **subnet** (pública se for acessar a API pela internet).
+3. Configure o **Security Group** da EC2:
+   - Porta **22** (SSH) apenas do seu IP, ou use **AWS Systems Manager Session Manager** e não abra a 22.
+   - Portas **80** e **443** para tráfego público (se a API for exposta direto; em produção é comum usar um Load Balancer).
+4. Instale **Docker** e **Docker Compose** na EC2 (via user data ou manualmente).
+5. **Build e deploy da API e do mock:**
+   - No seu PC ou em um pipeline (ex.: GitHub Actions):
+     - Build da imagem da API: na pasta `services/api`, usando o **Dockerfile** (não o Dockerfile.dev). Ex.: `docker build -t bilheteriatech-api ./services/api`
+     - Build da imagem do mock: `docker build -t bilheteriatech-mock ./services/payment-provider-mock`
+   - Envie as imagens para o **ECR** (Elastic Container Registry) da AWS ou copie os arquivos do projeto para a EC2 e faça o build lá.
+   - Na EC2, use um **docker-compose** só da API + mock (arquivo separado do da raiz), apontando `DATABASE_URL` para o RDS e variáveis de produção (JWT, WEBHOOK_SECRET, etc.). Exemplo de comando na EC2: `docker compose -f docker-compose.prod.yml up -d`.
+6. Configure um **Nginx** (ou outro proxy) na EC2 para encaminhar as requisições (ex.: porta 80) para o container da API (porta 3000). O mock pode ficar só acessível internamente.
+
+Os arquivos que “fazem” o build da API e do mock na AWS são os **Dockerfile** (não os Dockerfile.dev) em `services/api` e `services/payment-provider-mock`.
+
+---
+
+## Passo 5 — S3 e CloudFront (frontends)
+
+1. Crie **dois buckets** no S3, por exemplo: `bilheteriatech-web` e `bilheteriatech-admin`.
+2. Configure os buckets para **não** acesso público direto (acesso apenas via CloudFront).
+3. **Build dos frontends** no seu PC (ou no CI):
+   - Site cliente: `cd apps/web && npm ci && npm run build` (saída em `dist/`).
+   - Admin: `cd apps/admin && npm ci && npm run build` (saída em `dist/`).
+4. **Envie** o conteúdo de cada `dist/` para o bucket correspondente (por exemplo com `aws s3 sync apps/web/dist s3://bilheteriatech-web --delete` e o mesmo para o admin).
+5. Crie **duas distribuições no CloudFront**:
+   - Uma com origin no bucket do **web** e outra no bucket do **admin**.
+   - Em cada uma, configure o **default root object** como `index.html` e um **error page** (403/404) redirecionando para `index.html` com código 200 (para SPA).
+   - Ative **HTTPS** (certificado padrão da CloudFront ou ACM).
+6. (Opcional) Configure **domínios** (ex.: `web.seudominio.com` e `admin.seudominio.com`) apontando para as URLs do CloudFront.
+
+Os arquivos que “fazem” o build para a AWS são os **Dockerfile** (ou apenas `npm run build`) em `apps/web` e `apps/admin`; o deploy em si é o upload para S3 + invalidação no CloudFront.
+
+---
+
+## Passo 6 — Variáveis de ambiente na AWS
+
+Na EC2 (ou no arquivo que o docker-compose da produção usa), configure pelo menos:
+
+- `DATABASE_URL`: URL do RDS (PostgreSQL).
+- `JWT_SECRET`, `ADMIN_JWT_SECRET`, `WEBHOOK_SECRET`: valores fortes e únicos.
+- `PAYMENT_MOCK_URL`: URL interna do mock (ex.: `http://payment-mock:4000` se estiver no mesmo compose).
+- `API_BASE_URL`: URL pública da API (ex.: `https://api.seudominio.com`).
+- `CORS_ORIGIN`: origens dos frontends (ex.: `https://web.seudominio.com,https://admin.seudominio.com`).
+- Se usar RabbitMQ/Redis na AWS, `RABBITMQ_URL` e `REDIS_URL` conforme o serviço que você criar.
+
+---
+
+## Passo 7 — CI/CD (opcional)
+
+- **GitHub Actions** (ou outro CI):
+  - **Frontends:** em cada push na branch principal, rodar `npm run build`, enviar o `dist/` para o S3 e criar uma **invalidação** no CloudFront.
+  - **API:** build da imagem Docker, push para o ECR e atualização do serviço na EC2 (ou ECS, se migrar depois).
+
+Os arquivos do repositório que o CI usa para **build** são os mesmos: `Dockerfile` em `services/api`, `apps/web`, `apps/admin` e o `package.json`/scripts de cada um.
+
+---
+
+## Resumo do que faz o quê na AWS
+
+| O quê | Arquivo / recurso | Por quê |
+|-------|-------------------|--------|
+| Banco de dados | RDS (PostgreSQL) | A API usa Prisma e precisa de um PostgreSQL; o RDS é gerenciado e fica em rede privada. |
+| API e mock | `services/api/Dockerfile`, `services/payment-provider-mock/Dockerfile` | Build das imagens que rodam na EC2 (ou ECS). |
+| Site e admin | `apps/web` e `apps/admin` + `npm run build` | Gera os arquivos estáticos que vão para S3 e são servidos pelo CloudFront. |
+| Orquestração local | `docker-compose.yml` (raiz) | **Não é usado na AWS.** Só para desenvolvimento no seu PC. |
+
+---
+
+# Referência rápida — API
+
+- **Health:** `GET /health`
+- **Auth:** `POST /auth/register`, `POST /auth/login`, `POST /auth/admin/login`
+- **Eventos:** `GET/POST /events`, `GET/PUT/DELETE /events/:id`
+- **Pedidos:** `POST /orders`, `GET /orders/me/orders`, `GET /orders/admin/orders`, `GET /orders/:id`
+- **Pagamentos:** `POST /payments/fake`
+- **Webhook:** `POST /webhooks/payment` (header `x-signature` com HMAC do body)
+- **Usuários (admin):** `GET /admin/users`
+
+Autenticação: header `Authorization: Bearer <token>`.
+
+Variáveis principais da API: `DATABASE_URL`, `JWT_SECRET`, `ADMIN_JWT_SECRET`, `WEBHOOK_SECRET`, `PAYMENT_MOCK_URL`, `API_BASE_URL`, `CORS_ORIGIN`; opcionais: `QUEUE_TYPE`, `RABBITMQ_URL`, `REDIS_URL`. Lista completa e descrição estão no [ARCHITECTURE.md](ARCHITECTURE.md).
+
+---
+
+# Documentação — outros arquivos
+
+Toda a documentação fica na raiz ou em pastas referenciadas aqui:
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| [README.md](README.md) | Este arquivo: visão do projeto, rodar local (passo a passo), build e deploy na AWS (passo a passo), arquivos que fazem o quê, referência da API e links. |
+| [QUICKSTART.md](QUICKSTART.md) | Resumo rápido para subir com Docker, acessar as URLs, credenciais e testar o fluxo (cliente e admin). |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Arquitetura do sistema: componentes (web, admin, API, mock), fluxo de pagamento, segurança, banco, variáveis de ambiente e observabilidade. |
+| [docs/RABBITMQ_REDIS_SETUP.md](docs/RABBITMQ_REDIS_SETUP.md) | Configuração e uso de RabbitMQ e Redis no projeto. |
+| [services/api/ARCHITECTURE.md](services/api/ARCHITECTURE.md) | Arquitetura em camadas da API (controllers, services, repositories, DTOs, padrões). |
+
+Não há outro README dentro de pastas: a documentação principal é este **README.md** na raiz. Use os links acima para aprofundar em cada tema.

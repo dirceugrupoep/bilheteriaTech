@@ -1,5 +1,7 @@
 # Quick Start - BilheteriaTech
 
+> **Documentação completa** (passo a passo local e deploy AWS): [README.md](README.md)
+
 ## Início Rápido (5 minutos)
 
 ### 1. Pré-requisitos
