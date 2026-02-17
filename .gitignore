@@ -1,0 +1,23 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Prisma
+prisma/migrations/
+
+# Docker
+.docker/
+
+# AWS
+.aws/
+*.pem

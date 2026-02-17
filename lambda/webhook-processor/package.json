@@ -1,0 +1,15 @@
+{
+  "name": "payment-webhook-processor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "dependencies": {
+    "@prisma/client": "^5.7.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.119",
+    "prisma": "^5.7.1",
+    "typescript": "^5.3.3"
+  }
+}

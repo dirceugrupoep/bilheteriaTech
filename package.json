@@ -1,0 +1,24 @@
+{
+  "name": "bilheteriatech",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev": "docker compose up --build",
+    "lint": "npm run lint --workspaces",
+    "test": "npm run test --workspaces",
+    "prisma:migrate": "cd services/api && npm run prisma:migrate",
+    "prisma:seed": "cd services/api && npm run prisma:seed",
+    "build": "npm run build --workspaces",
+    "build:web": "cd apps/web && npm run build",
+    "build:admin": "cd apps/admin && npm run build",
+    "build:api": "cd services/api && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.3"
+  }
+}
