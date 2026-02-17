@@ -25,34 +25,20 @@ API REST do sistema de bilheteria. Responsável por autenticação, eventos, ped
 
 ## Como rodar
 
-### Pré-requisitos
-
-- Node.js 20+
-- PostgreSQL (ou use Docker)
-- RabbitMQ e Redis (ou use Docker Compose do monorepo)
-
-### Instalação
+O projeto é executado via Docker. Na **raiz do monorepo**:
 
 ```bash
-# Na raiz do monorepo
-npm install
-
-# Gerar Prisma Client
-cd services/api
-npm run prisma:generate
-```
-
-### Desenvolvimento
-
-```bash
-# Com Docker (recomendado): na raiz do projeto
 docker compose up --build
-
-# Sem Docker: configure DATABASE_URL, RABBITMQ_URL, REDIS_URL no .env e execute
-npm run dev
 ```
 
-### Scripts disponíveis
+A API sobe na porta 3000; migrations e seed rodam no startup do container. Para passos completos, credenciais e troubleshooting, use a documentação na raiz:
+
+- **[QUICKSTART.md](../../QUICKSTART.md)** — como subir, acessar e testar o sistema
+- **[ARCHITECTURE.md](../../ARCHITECTURE.md)** — visão geral do sistema, componentes e fluxos
+
+### Scripts (dentro do container ou local)
+
+Na pasta `services/api`:
 
 | Script | Descrição |
 |--------|-----------|
@@ -234,8 +220,17 @@ Exemplo mínimo para um “produto”:
 
 ---
 
-## Documentação adicional
+## Documentação
 
-- **Arquitetura detalhada**: ver `ARCHITECTURE.md` neste diretório.
-- **RabbitMQ e Redis**: ver `docs/RABBITMQ_REDIS_SETUP.md` na raiz do monorepo.
-- **Projeto completo**: ver `README.md` e `QUICKSTART.md` na raiz do monorepo.
+A documentação completa do projeto está na **raiz do monorepo**:
+
+| Documento (raiz) | Descrição |
+|------------------|-----------|
+| [QUICKSTART.md](../../QUICKSTART.md) | Como subir com Docker, acessar as aplicações, credenciais e testar o fluxo |
+| [ARCHITECTURE.md](../../ARCHITECTURE.md) | Arquitetura do sistema, componentes, fluxos, segurança e variáveis de ambiente |
+
+Outros arquivos de referência:
+
+- [README.md](../../README.md) — visão geral e deploy
+- [docs/RABBITMQ_REDIS_SETUP.md](../../docs/RABBITMQ_REDIS_SETUP.md) — RabbitMQ e Redis
+- [ARCHITECTURE.md](./ARCHITECTURE.md) (neste diretório) — arquitetura em camadas do backend
