@@ -33,8 +33,8 @@ docker compose up --build
 
 A API sobe na porta 3000; migrations e seed rodam no startup do container. Para passos completos, credenciais e troubleshooting, use a documentação na raiz:
 
-- **[QUICKSTART.md](../../QUICKSTART.md)** — como subir, acessar e testar o sistema
-- **[ARCHITECTURE.md](../../ARCHITECTURE.md)** — visão geral do sistema, componentes e fluxos
+- **[QUICKSTART.md](QUICKSTART.md)** — como subir, acessar e testar o sistema
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** — visão geral do sistema, componentes e fluxos
 
 ### Scripts (dentro do container ou local)
 
@@ -226,8 +226,8 @@ A documentação completa do projeto está na **raiz do monorepo**:
 
 | Documento (raiz) | Descrição |
 |------------------|-----------|
-| [QUICKSTART.md](../../QUICKSTART.md) | Como subir com Docker, acessar as aplicações, credenciais e testar o fluxo |
-| [ARCHITECTURE.md](../../ARCHITECTURE.md) | Arquitetura do sistema, componentes, fluxos, segurança e variáveis de ambiente |
+| [QUICKSTART.md](QUICKSTART.md) | Como subir com Docker, acessar as aplicações, credenciais e testar o fluxo |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Arquitetura do sistema, componentes, fluxos, segurança e variáveis de ambiente |
 
 Outros arquivos de referência:
 
