@@ -231,6 +231,5 @@ A documentação completa do projeto está na **raiz do monorepo**:
 
 Outros arquivos de referência:
 
-- [README.md](../../README.md) — visão geral e deploy
-- [docs/RABBITMQ_REDIS_SETUP.md](../../docs/RABBITMQ_REDIS_SETUP.md) — RabbitMQ e Redis
-- [ARCHITECTURE.md](./ARCHITECTURE.md) (neste diretório) — arquitetura em camadas do backend
+- [docs/RABBITMQ_REDIS_SETUP.md](docs/RABBITMQ_REDIS_SETUP.md) — RabbitMQ e Redis
+- [ARCHITECTURE.md](ARCHITECTURE.md) (neste diretório) — arquitetura em camadas do backend
