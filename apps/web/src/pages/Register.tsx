@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-15
- * @description Página de cadastro de novos clientes no sistema de bilheteria, permitindo criação de conta para compra de ingressos.
+ * @date 2025-02-18
+ * @description Página de cadastro de usuário
  */
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';

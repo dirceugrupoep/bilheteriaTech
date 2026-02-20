@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-16
- * @description Página administrativa que lista todos os usuários cadastrados no sistema de bilheteria, incluindo clientes e administradores.
+ * @date 2025-02-18
+ * @description Página de gestão de usuários do admin
  */
+
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import {

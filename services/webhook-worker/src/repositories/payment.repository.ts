@@ -1,11 +1,10 @@
 /**
- * Repository que abstrai o acesso aos dados de pagamentos no banco de dados.
- * Contém os métodos necessários para o processamento de webhooks no worker.
- * 
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
+ * @date 2025-02-19
+ * @description Repositório de pagamento do webhook worker
  */
+
 import { PrismaClient, Payment } from '@prisma/client';
 
 export class PaymentRepository {

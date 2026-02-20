@@ -1,12 +1,10 @@
 /**
- * Worker que consome mensagens da fila RabbitMQ e processa webhooks de pagamento.
- * Processa mensagens de forma assíncrona, atualizando o status de pedidos e pagamentos
- * no banco de dados. Implementa reconexão automática e retry em caso de falhas.
- * 
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
+ * @date 2025-02-19
+ * @description Ponto de entrada do serviço webhook worker
  */
+
 import { PrismaClient } from '@prisma/client';
 import amqp, { Connection, Channel, ConsumeMessage } from 'amqplib';
 import pino from 'pino';

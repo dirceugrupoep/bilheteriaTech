@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-13
- * @description Página de detalhes do evento onde o cliente pode visualizar informações completas e realizar a compra de ingressos.
+ * @date 2025-02-18
+ * @description Página de detalhes do evento com compra de ingressos
  */
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';

@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-16
- * @description Serviço mock de gateway de pagamento que simula processamento de pagamentos e dispara webhooks de confirmação para o sistema de bilheteria.
+ * @date 2025-02-20
+ * @description Serviço mock de provedor de pagamento para testes
  */
+
 import express from 'express';
 import cors from 'cors';
 import pinoHttp from 'pino-http';

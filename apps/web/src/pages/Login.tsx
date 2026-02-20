@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-14
- * @description Página de login para clientes do sistema de bilheteria, permitindo autenticação e acesso à área do cliente.
+ * @date 2025-02-18
+ * @description Página de login do usuário
  */
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';

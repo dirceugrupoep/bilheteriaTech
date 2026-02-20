@@ -1,11 +1,10 @@
 /**
- * Service que contém a lógica de negócio para processamento de pagamentos.
- * Gerencia pagamentos fake, recebimento de webhooks e publicação de mensagens na fila.
- * 
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
+ * @date 2025-02-15
+ * @description Serviço de pagamentos para processamento de pagamentos
  */
+
 import axios from 'axios';
 import { PaymentRepository } from '../repositories/payment.repository.js';
 import { OrderRepository } from '../repositories/order.repository.js';
@@ -70,6 +69,8 @@ export class PaymentService {
           ...webhookPayload,
           signature,
           webhookUrl: `${env.API_BASE_URL}/webhooks/payment`,
+        }, {
+          timeout: 5000,
         });
 
         logger.info(`Webhook disparado para pedido ${order.id}`);
@@ -138,6 +139,11 @@ export class PaymentService {
       }
 
       if (data.status === 'PAID') {
+        if (payment.status === 'PAID') {
+          logger.info(`Webhook ignorado: pagamento ${payment.id} já está como PAID`);
+          return;
+        }
+
         // Atualiza o pagamento e o pedido em paralelo para melhor performance
         await Promise.all([
           this.paymentRepository.updateStatus(payment.id, 'PAID'),
@@ -146,6 +152,11 @@ export class PaymentService {
 
         logger.info(`Pedido ${payment.orderId} marcado como PAID`);
       } else if (data.status === 'FAILED') {
+        if (payment.status === 'FAILED') {
+          logger.info(`Webhook ignorado: pagamento ${payment.id} já está como FAILED`);
+          return;
+        }
+
         await this.paymentRepository.updateStatus(payment.id, 'FAILED');
         logger.info(`Pagamento ${payment.id} marcado como FAILED`);
       }

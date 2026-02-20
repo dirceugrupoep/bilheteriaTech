@@ -1,11 +1,10 @@
 /**
- * Service que processa webhooks recebidos da fila RabbitMQ.
- * Atualiza o status de pagamentos e pedidos no banco de dados.
- * 
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
+ * @date 2025-02-19
+ * @description Serviço de pagamento para processamento de webhooks
  */
+
 import { PaymentRepository } from '../repositories/payment.repository.js';
 import { OrderRepository } from '../repositories/order.repository.js';
 import pino from 'pino';

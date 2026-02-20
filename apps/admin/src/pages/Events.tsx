@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-14
- * @description Página administrativa para gerenciamento completo de eventos (CRUD), permitindo criar, editar e excluir eventos do sistema.
+ * @date 2025-02-18
+ * @description Página de gestão de eventos do admin
  */
+
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import {

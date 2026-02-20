@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-13
- * @description Rotas para gerenciamento de eventos do sistema de bilheteria, com endpoints públicos para listagem e protegidos para CRUD (admin).
+ * @date 2025-02-16
+ * @description Rotas de eventos para operações CRUD
  */
+
 import { Router } from 'express';
 import {
   listEvents,

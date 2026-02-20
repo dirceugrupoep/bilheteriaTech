@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-13
- * @description Controller responsável pelo gerenciamento de eventos do sistema de bilheteria, incluindo listagem, criação, atualização e exclusão.
+ * @date 2025-02-16
+ * @description Controller de eventos para operações CRUD
  */
+
 import { Request, Response } from 'express';
 import { EventService } from '../services/event.service.js';
 import { CreateEventDTO, UpdateEventDTO } from '../dtos/event.dto.js';

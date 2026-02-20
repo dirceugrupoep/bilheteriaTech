@@ -1,9 +1,10 @@
 /**
- * @project BilheteriaTech77]
+ * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-13
- * @description Dashboard administrativo que exibe estatísticas gerais do sistema de bilheteria, incluindo eventos, pedidos e usuários.
+ * @date 2025-02-18
+ * @description Página de dashboard do admin com estatísticas gerais
  */
+
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import {

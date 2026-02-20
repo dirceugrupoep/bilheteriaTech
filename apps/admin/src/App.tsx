@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
- * @description Componente principal da aplicação administrativa, gerenciando rotas protegidas, autenticação admin e navegação do painel.
+ * @date 2025-02-17
+ * @description Layout principal do app admin com navegação e rotas
  */
+
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import { useAuth, AuthProvider } from './hooks/useAuth';
 import {

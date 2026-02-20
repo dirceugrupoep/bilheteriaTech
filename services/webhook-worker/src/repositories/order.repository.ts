@@ -1,11 +1,10 @@
 /**
- * Repository que abstrai o acesso aos dados de pedidos no banco de dados.
- * Contém os métodos necessários para o processamento de webhooks no worker.
- * 
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
+ * @date 2025-02-19
+ * @description Repositório de pedidos do webhook worker
  */
+
 import { PrismaClient, Order } from '@prisma/client';
 
 export class OrderRepository {

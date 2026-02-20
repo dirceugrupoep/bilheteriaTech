@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-16
- * @description Controller responsável pelo gerenciamento de usuários do sistema, permitindo listagem de todos os usuários cadastrados (admin only).
+ * @date 2025-02-16
+ * @description Controller de usuários para gestão de usuários
  */
+
 import { Request, Response } from 'express';
 import { UserService } from '../services/user.service.js';
 import { logger } from '../config/logger.js';

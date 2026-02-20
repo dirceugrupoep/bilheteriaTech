@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-12
- * @description Controller responsável pela autenticação do sistema, incluindo registro de clientes, login de clientes e login de administradores.
+ * @date 2025-02-16
+ * @description Controller de autenticação para login e cadastro
  */
+
 import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service.js';
 import { RegisterDTO, LoginDTO } from '../dtos/auth.dto.js';

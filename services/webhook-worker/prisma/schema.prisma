@@ -1,0 +1,78 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  createdAt    DateTime @default(now())
+  orders       Order[]
+
+  @@map("users")
+}
+
+model Event {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  date         DateTime
+  priceCents   Int
+  totalTickets Int
+  createdAt    DateTime @default(now())
+  orders       Order[]
+
+  @@map("events")
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  eventId     String
+  quantity    Int
+  amountCents Int
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  user        User        @relation(fields: [userId], references: [id])
+  event       Event       @relation(fields: [eventId], references: [id])
+  payments    Payment[]
+
+  @@map("orders")
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  orderId   String
+  provider  String        @default("FAKEPAY")
+  status    PaymentStatus @default(PENDING)
+  payload   Json?
+  createdAt DateTime      @default(now())
+  order     Order         @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}

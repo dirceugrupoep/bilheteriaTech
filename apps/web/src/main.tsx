@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-12
- * @description Ponto de entrada da aplicação web cliente, inicializando React e configurando o roteamento do sistema de bilheteria.
+ * @date 2025-02-17
+ * @description Ponto de entrada do app web e renderização raiz
  */
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';

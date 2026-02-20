@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
- * @description Componente principal da aplicação web cliente, gerenciando rotas, autenticação e navegação do sistema de bilheteria.
+ * @date 2025-02-17
+ * @description Layout principal do app web com navegação e rotas
  */
+
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { useAuth, AuthProvider } from './hooks/useAuth';
 import { AppBar, Toolbar, Button, Container, Box, Typography, Avatar, Menu, MenuItem, IconButton } from '@mui/material';

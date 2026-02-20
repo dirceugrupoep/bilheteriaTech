@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-16
- * @description Página que exibe todos os pedidos de ingressos realizados pelo cliente logado, com status e detalhes de cada pedido.
+ * @date 2025-02-18
+ * @description Página de listagem de pedidos do usuário
  */
+
 import { useEffect, useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../api/client';

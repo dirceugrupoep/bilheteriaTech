@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-12
- * @description Página inicial do sistema de bilheteria que exibe a listagem de eventos disponíveis para compra de ingressos.
+ * @date 2025-02-18
+ * @description Página inicial pública com listagem de eventos
  */
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client';

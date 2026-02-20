@@ -1,11 +1,10 @@
 /**
- * Controller que gerencia as requisições HTTP relacionadas a pagamentos.
- * Processa pagamentos fake e recebe webhooks de confirmação de pagamento.
- * 
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-15
+ * @date 2025-02-16
+ * @description Controller de pagamentos e processador de webhook
  */
+
 import { Request, Response } from 'express';
 import { PaymentService } from '../services/payment.service.js';
 import { FakePaymentDTO, WebhookDTO } from '../dtos/payment.dto.js';
@@ -36,8 +35,7 @@ export async function fakePayment(req: Request, res: Response): Promise<void> {
       error instanceof Error &&
       (error.message === 'Pedido não encontrado' ||
         error.message === 'Acesso negado' ||
-        error.message === 'Pedido já processado' ||
-        error.message === 'Cartão inválido')
+        error.message === 'Pedido já processado')
     ) {
       res.status(400).json({ error: error.message });
       return;

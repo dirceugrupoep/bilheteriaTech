@@ -1,12 +1,10 @@
 /**
- * Service para publicação de mensagens em filas RabbitMQ e gerenciamento de cache Redis.
- * Implementa conexão e reconexão automática, publicação de mensagens persistentes
- * e operações de cache com TTL configurável.
- * 
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
+ * @date 2025-02-15
+ * @description Serviço de filas para RabbitMQ e Redis
  */
+
 import amqp, { Connection, Channel } from 'amqplib';
 import Redis from 'ioredis';
 import { logger } from '../config/logger.js';

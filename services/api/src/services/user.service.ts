@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
- * @description Service com lógica de negócio para usuários do sistema de bilheteria.
+ * @date 2025-02-15
+ * @description Serviço de usuários para lógica de negócio
  */
+
 import { UserRepository } from '../repositories/user.repository.js';
 import { logger } from '../config/logger.js';
 

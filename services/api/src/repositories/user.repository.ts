@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
- * @description Repository para abstrair acesso aos dados de usuários no banco de dados.
+ * @date 2025-02-14
+ * @description Repositório de usuários para operações de banco de dados
  */
+
 import { PrismaClient, User } from '@prisma/client';
 import { prisma } from '../config/database.js';
 

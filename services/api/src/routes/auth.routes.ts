@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-12
- * @description Rotas de autenticação do sistema de bilheteria, incluindo registro, login de clientes e login de administradores com rate limiting.
+ * @date 2025-02-16
+ * @description Rotas de autenticação para login e cadastro
  */
+
 import { Router } from 'express';
 import { register, login, adminLogin } from '../controllers/auth.controller.js';
 import rateLimit from 'express-rate-limit';

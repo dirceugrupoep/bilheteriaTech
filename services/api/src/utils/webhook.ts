@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-15
- * @description Utilitários para assinatura e validação de webhooks de pagamento usando HMAC SHA256 no sistema de bilheteria.
+ * @date 2025-02-12
+ * @description Assinatura e verificação de webhooks
  */
+
 import crypto from 'crypto';
 import { env } from '../config/env.js';
 

@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
- * @description Service com lógica de negócio para eventos do sistema de bilheteria.
+ * @date 2025-02-15
+ * @description Serviço de eventos para lógica de negócio
  */
+
 import { EventRepository } from '../repositories/event.repository.js';
 import { CreateEventInput, UpdateEventInput } from '../dtos/event.dto.js';
 import { logger } from '../config/logger.js';

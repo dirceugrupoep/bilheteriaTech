@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-14
- * @description Controller responsável pelo gerenciamento de pedidos de ingressos, incluindo criação de pedidos e consulta de pedidos do cliente e admin.
+ * @date 2025-02-16
+ * @description Controller de pedidos para compra de ingressos
  */
+
 import { Request, Response } from 'express';
 import { OrderService } from '../services/order.service.js';
 import { CreateOrderDTO } from '../dtos/order.dto.js';

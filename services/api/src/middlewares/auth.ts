@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-13
- * @description Middlewares de autenticação do sistema de bilheteria, validando tokens JWT para usuários comuns e administradores.
+ * @date 2025-02-17
+ * @description Middlewares de autenticação para JWT
  */
+
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt.js';
 import { RequestWithUser } from '../types/auth.js';

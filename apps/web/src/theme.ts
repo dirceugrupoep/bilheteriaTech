@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
- * @description Tema Material-UI customizado com cores azul claro, branco e dourado para o sistema de bilheteria.
+ * @date 2025-02-17
+ * @description Configuração do tema MUI para o app web
  */
+
 import { createTheme } from '@mui/material/styles';
 
 export const theme = createTheme({

@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
- * @description Repository para abstrair acesso aos dados de pedidos no banco de dados.
+ * @date 2025-02-14
+ * @description Repositório de pedidos para operações de banco de dados
  */
+
 import { PrismaClient, Order } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { CreateOrderInput } from '../dtos/order.dto.js';

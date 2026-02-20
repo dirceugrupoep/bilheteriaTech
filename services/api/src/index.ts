@@ -1,12 +1,10 @@
 /**
- * Servidor principal da API do sistema de bilheteria.
- * Configura middlewares de segurança, logging e parsing de requisições,
- * define todas as rotas da aplicação e inicializa o servidor Express.
- * 
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
+ * @date 2025-02-17
+ * @description Ponto de entrada do serviço API e configuração do app Express
  */
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -25,17 +23,14 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN?.split(',') || [
-      'http://localhost:5173',
-      'http://localhost:5174',
-    ],
+    origin: env.CORS_ORIGIN.split(',').map((origin) => origin.trim()),
     credentials: true,
   })
 );
 app.use(pinoHttp({ logger }));
 // Middleware de raw body deve vir antes do express.json() para permitir validação de assinatura HMAC nos webhooks
 app.use('/webhooks', express.raw({ type: 'application/json' }));
-app.use(express.json());
+app.use(express.json({ limit: '1mb' }));
 
 // Health check
 app.get('/health', (_req, res) => {

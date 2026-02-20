@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-14
- * @description Utilitários para geração e validação de tokens JWT do sistema de bilheteria, com suporte para tokens de usuários e administradores.
+ * @date 2025-02-12
+ * @description Utilitários de geração e verificação de tokens JWT
  */
+
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
 import { JWTPayload } from '../types/auth.js';

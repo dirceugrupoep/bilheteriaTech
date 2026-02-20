@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-12
- * @description Página de login do painel administrativo do sistema de bilheteria, permitindo acesso exclusivo para administradores.
+ * @date 2025-02-18
+ * @description Página de login do admin
  */
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';

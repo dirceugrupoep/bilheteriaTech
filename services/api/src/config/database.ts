@@ -1,3 +1,10 @@
+/**
+ * @project BilheteriaTech
+ * @author Dirceu Silva de Oliveira Tech
+ * @date 2025-02-12
+ * @description Configuração do cliente de banco de dados Prisma
+ */
+
 import { PrismaClient } from '@prisma/client';
 import { logger } from './logger.js';
 

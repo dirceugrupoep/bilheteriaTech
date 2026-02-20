@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
- * @description DTOs (Data Transfer Objects) para pedidos do sistema de bilheteria.
+ * @date 2025-02-13
+ * @description DTOs e esquemas Zod de pedidos
  */
+
 import { z } from 'zod';
 
 export const CreateOrderDTO = z.object({

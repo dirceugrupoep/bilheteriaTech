@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-14
- * @description Cliente HTTP para comunicação com a API do sistema de bilheteria, incluindo interceptação de tokens de autenticação.
+ * @date 2025-02-17
+ * @description Cliente API para requisições HTTP do app web
  */
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 export interface ApiError {

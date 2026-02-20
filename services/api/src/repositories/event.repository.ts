@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
- * @description Repository para abstrair acesso aos dados de eventos no banco de dados.
+ * @date 2025-02-14
+ * @description Repositório de eventos para operações de banco de dados
  */
+
 import { PrismaClient, Event } from '@prisma/client';
 import { prisma } from '../config/database.js';
 import { CreateEventInput, UpdateEventInput } from '../dtos/event.dto.js';

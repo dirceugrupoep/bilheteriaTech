@@ -23,9 +23,9 @@ services:
     container_name: bilheteriatech-api
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/bilheteriatech?schema=public
-      JWT_SECRET: ${JWT_SECRET:-change-me-in-production-use-long-random-string}
-      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET:-change-me-in-production-use-long-random-string}
-      WEBHOOK_SECRET: ${WEBHOOK_SECRET:-change-me-in-production-use-long-random-string}
+      JWT_SECRET: ${JWT_SECRET}
+      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+      WEBHOOK_SECRET: ${WEBHOOK_SECRET}
       PAYMENT_MOCK_URL: http://payment-mock:4000
       API_BASE_URL: http://api:3000
       NODE_ENV: development
@@ -59,6 +59,25 @@ services:
       - "4000:4000"
     volumes:
       - ./services/payment-provider-mock:/app
+      - /app/node_modules
+    command: npm run dev
+
+  webhook-worker:
+    build:
+      context: ./services/webhook-worker
+      dockerfile: Dockerfile.dev
+    container_name: bilheteriatech-webhook-worker
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/bilheteriatech?schema=public
+      RABBITMQ_URL: amqp://admin:admin123@rabbitmq:5672
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    volumes:
+      - ./services/webhook-worker:/app
       - /app/node_modules
     command: npm run dev
 

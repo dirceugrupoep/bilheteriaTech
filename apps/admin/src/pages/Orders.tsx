@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-15
- * @description Página administrativa que exibe todos os pedidos do sistema de bilheteria, permitindo visualização e acompanhamento de status.
+ * @date 2025-02-18
+ * @description Página de gestão de pedidos do admin
  */
+
 import { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import {

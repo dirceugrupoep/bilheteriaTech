@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-14
- * @description Rotas para gerenciamento de pedidos do sistema de bilheteria, permitindo criação de pedidos e consulta para clientes e administradores.
+ * @date 2025-02-16
+ * @description Rotas de pedidos para compra de ingressos
  */
+
 import { Router } from 'express';
 import {
   createOrder,

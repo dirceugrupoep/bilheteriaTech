@@ -1,13 +1,15 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-17
- * @description Service com lógica de negócio para pedidos do sistema de bilheteria.
+ * @date 2025-02-15
+ * @description Serviço de pedidos para lógica de negócio
  */
+
 import { OrderRepository } from '../repositories/order.repository.js';
 import { EventRepository } from '../repositories/event.repository.js';
 import { CreateOrderInput, OrderResponseDTO } from '../dtos/order.dto.js';
 import { logger } from '../config/logger.js';
+import { prisma } from '../config/database.js';
 
 export class OrderService {
   constructor(
@@ -17,30 +19,49 @@ export class OrderService {
 
   async createOrder(userId: string, data: CreateOrderInput): Promise<OrderResponseDTO> {
     try {
-      // Buscar evento
-      const event = await this.eventRepository.findById(data.eventId);
-      if (!event) {
-        throw new Error('Evento não encontrado');
-      }
+      const order = await prisma.$transaction(async (tx) => {
+        const event = await tx.event.findUnique({
+          where: { id: data.eventId },
+        });
 
-      // Verificar disponibilidade de tickets
-      const ordersCount = await this.orderRepository.countByEventAndStatus(event.id, [
-        'PENDING',
-        'PAID',
-      ]);
+        if (!event) {
+          throw new Error('Evento não encontrado');
+        }
 
-      if (ordersCount + data.quantity > event.totalTickets) {
-        throw new Error('Tickets insuficientes');
-      }
+        const ordersCount = await tx.order.aggregate({
+          where: {
+            eventId: event.id,
+            status: { in: ['PENDING', 'PAID'] },
+          },
+          _sum: { quantity: true },
+        });
 
-      // Calcular valor total
-      const amountCents = event.priceCents * data.quantity;
+        const soldTickets = ordersCount._sum.quantity ?? 0;
+        if (soldTickets + data.quantity > event.totalTickets) {
+          throw new Error('Tickets insuficientes');
+        }
 
-      // Criar pedido
-      const order = await this.orderRepository.create({
-        ...data,
-        userId,
-        amountCents,
+        const amountCents = event.priceCents * data.quantity;
+
+        return tx.order.create({
+          data: {
+            userId,
+            eventId: data.eventId,
+            quantity: data.quantity,
+            amountCents,
+            status: 'PENDING',
+          },
+          include: {
+            event: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        });
       });
 
       return order as OrderResponseDTO;

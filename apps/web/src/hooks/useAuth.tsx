@@ -1,9 +1,10 @@
 /**
  * @project BilheteriaTech
  * @author Dirceu Silva de Oliveira Tech
- * @date 2026-02-13
- * @description Hook customizado para gerenciar autenticação de clientes, incluindo login, registro e controle de estado do usuário logado.
+ * @date 2025-02-17
+ * @description Contexto e hook de autenticação para o app web
  */
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { api } from '../api/client';
 
