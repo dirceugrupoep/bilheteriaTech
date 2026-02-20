@@ -12,7 +12,7 @@ export const FakePaymentDTO = z.object({
   cardName: z.string().min(2),
   expMonth: z.number().int().min(1).max(12),
   expYear: z.number().int().min(2024),
-  cvv: z.string().length(3),
+  cvv: z.string().regex(/^\d{3,4}$/),
 });
 
 export const WebhookDTO = z.object({

@@ -45,13 +45,17 @@ async function main() {
     },
   ];
 
-  for (const event of events) {
-    await prisma.event.create({
-      data: event,
-    });
+  const existingEventsCount = await prisma.event.count();
+
+  if (existingEventsCount === 0) {
+    for (const event of events) {
+      await prisma.event.create({
+        data: event,
+      });
+    }
   }
 
-  console.log(`${events.length} eventos criados`);
+  console.log(existingEventsCount === 0 ? `${events.length} eventos criados` : 'Eventos já existentes, seed ignorado para eventos');
 }
 
 main()

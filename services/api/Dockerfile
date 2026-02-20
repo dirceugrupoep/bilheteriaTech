@@ -2,9 +2,11 @@ FROM node:20-alpine AS base
 
 WORKDIR /app
 
+RUN apk add --no-cache openssl libc6-compat
+
 FROM base AS deps
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules

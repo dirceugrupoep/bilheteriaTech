@@ -42,14 +42,11 @@ export class PaymentService {
         throw new Error('Pedido já processado');
       }
 
-      // Validar cartão fake (deve começar com 4242)
-      const isValidCard = cardData.cardNumber.startsWith('4242');
-
       // Criar payment
       const payment = await this.paymentRepository.create({
         orderId: order.id,
         provider: 'FAKEPAY',
-        status: isValidCard ? 'PENDING' : 'FAILED',
+        status: 'PENDING',
         payload: {
           cardNumber: cardData.cardNumber.slice(-4),
           cardName: cardData.cardName,
@@ -57,10 +54,6 @@ export class PaymentService {
           expYear: cardData.expYear,
         },
       });
-
-      if (!isValidCard) {
-        throw new Error('Cartão inválido');
-      }
 
       // Chamar serviço mock para disparar webhook
       try {
@@ -96,8 +89,7 @@ export class PaymentService {
         error instanceof Error &&
         (error.message === 'Pedido não encontrado' ||
           error.message === 'Acesso negado' ||
-          error.message === 'Pedido já processado' ||
-          error.message === 'Cartão inválido')
+          error.message === 'Pedido já processado')
       ) {
         throw error;
       }
@@ -110,12 +102,26 @@ export class PaymentService {
    * Este método retorna rapidamente após publicar na fila, não bloqueando a resposta HTTP.
    */
   async receiveWebhook(data: WebhookInput): Promise<void> {
+    let publishedToQueue = false;
+
     try {
       await this.queueService.publishWebhook(data);
+      publishedToQueue = true;
       logger.info('Webhook recebido e publicado no RabbitMQ', { paymentId: data.paymentId });
     } catch (error) {
       logger.error('Erro ao publicar webhook no RabbitMQ:', error);
-      throw new Error('Erro ao processar webhook');
+      if (env.NODE_ENV === 'production') {
+        throw new Error('Erro ao processar webhook');
+      }
+    }
+
+    // Em desenvolvimento, processa inline para evitar dependência de worker dedicado.
+    if (env.NODE_ENV !== 'production') {
+      await this.processWebhook(data);
+      logger.info('Webhook processado inline', {
+        paymentId: data.paymentId,
+        publishedToQueue,
+      });
     }
   }
 

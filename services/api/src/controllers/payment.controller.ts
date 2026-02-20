@@ -54,8 +54,16 @@ export async function webhookPayment(req: Request, res: Response): Promise<void>
       return;
     }
 
-    const rawBody = req.body instanceof Buffer ? req.body.toString('utf8') : JSON.stringify(req.body);
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    let rawBody: string;
+    if (req.body instanceof Buffer) {
+      rawBody = req.body.toString('utf8');
+    } else if (typeof req.body === 'string') {
+      rawBody = req.body;
+    } else {
+      rawBody = JSON.stringify(req.body);
+    }
+
+    const body = JSON.parse(rawBody);
     const isValid = verifyWebhookSignature(rawBody, signature);
 
     if (!isValid) {

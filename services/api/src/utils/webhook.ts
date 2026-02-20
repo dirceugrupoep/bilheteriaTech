@@ -19,6 +19,9 @@ export function verifyWebhookSignature(
   signature: string
 ): boolean {
   const expectedSignature = signWebhook(payload);
+  if (signature.length !== expectedSignature.length) {
+    return false;
+  }
   return crypto.timingSafeEqual(
     Buffer.from(signature),
     Buffer.from(expectedSignature)
