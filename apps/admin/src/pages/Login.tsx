@@ -54,16 +54,15 @@ function Login() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        bgcolor: '#f5f7fa',
-        background: 'linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%)',
+        bgcolor: '#f3f4f6',
       }}
     >
       <Container maxWidth="sm">
         <Fade in timeout={500}>
           <Box>
             <Box sx={{ textAlign: 'center', mb: 4 }}>
-              <AdminPanelSettings sx={{ fontSize: 80, color: 'primary.main', mb: 2 }} />
-              <Typography variant="h4" fontWeight={700} gutterBottom>
+              <AdminPanelSettings sx={{ fontSize: 48, color: 'primary.main', mb: 1 }} />
+              <Typography variant="h4" fontWeight={600} gutterBottom>
                 Painel Administrativo
               </Typography>
               <Typography variant="body1" color="text.secondary">
@@ -74,8 +73,8 @@ function Login() {
             <Card
               elevation={0}
               sx={{
-                borderRadius: 3,
-                border: '1px solid #e0e0e0',
+                borderRadius: 1.5,
+                border: '1px solid #e5e7eb',
                 overflow: 'hidden',
               }}
             >
@@ -139,14 +138,14 @@ function Login() {
                     disabled={loading}
                     sx={{
                       py: 1.5,
-                      borderRadius: 2,
-                      fontWeight: 600,
+                      borderRadius: 1,
+                      fontWeight: 500,
                     }}
                   >
                     {loading ? 'Entrando...' : 'Entrar'}
                   </Button>
 
-                  <Box sx={{ mt: 3, p: 2, bgcolor: '#fff9e6', borderRadius: 2 }}>
+                  <Box sx={{ mt: 3, p: 2, bgcolor: '#f9fafb', borderRadius: 1, border: '1px solid #e5e7eb' }}>
                     <Typography variant="caption" color="text.secondary">
                       <strong>Credenciais padrão:</strong> admin@bilheteriatech.local / Admin@123
                     </Typography>

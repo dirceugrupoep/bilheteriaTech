@@ -97,11 +97,9 @@ function Home() {
           variant="h3"
           component="h1"
           sx={{
-            fontWeight: 700,
+            fontWeight: 600,
             mb: 2,
-            background: 'linear-gradient(135deg, #42a5f5 0%, #1976d2 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            color: 'text.primary',
           }}
         >
           Eventos Disponíveis
@@ -131,35 +129,25 @@ function Home() {
                     display: 'flex',
                     flexDirection: 'column',
                     textDecoration: 'none',
-                    borderRadius: 3,
+                    borderRadius: 1.5,
                     overflow: 'hidden',
-                    transition: 'all 0.3s ease',
+                    border: '1px solid #e5e7eb',
+                    transition: 'border-color 0.2s ease',
                     '&:hover': {
-                      transform: 'translateY(-8px)',
-                      boxShadow: '0 12px 24px rgba(66, 165, 245, 0.2)',
+                      borderColor: '#cbd5e1',
                     },
                   }}
                 >
                   <CardMedia
                     sx={{
                       height: 200,
-                      background: 'linear-gradient(135deg, #42a5f5 0%, #1976d2 100%)',
+                      background: '#e5e7eb',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      position: 'relative',
-                      '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'linear-gradient(135deg, rgba(255, 193, 7, 0.3) 0%, rgba(66, 165, 245, 0.3) 100%)',
-                      },
                     }}
                   >
-                    <Event sx={{ fontSize: 80, color: 'white', zIndex: 1 }} />
+                    <Event sx={{ fontSize: 56, color: '#6b7280' }} />
                   </CardMedia>
                   <CardContent sx={{ flexGrow: 1, p: 3 }}>
                     <Typography
@@ -215,7 +203,7 @@ function Home() {
                           variant="h5"
                           sx={{
                             fontWeight: 700,
-                            color: 'secondary.main',
+                            color: 'primary.main',
                             lineHeight: 1,
                           }}
                         >
@@ -226,9 +214,9 @@ function Home() {
                         label={`${event.totalTickets} ingressos`}
                         size="small"
                         sx={{
-                          bgcolor: 'primary.light',
-                          color: 'primary.dark',
-                          fontWeight: 600,
+                          bgcolor: '#f3f4f6',
+                          color: 'text.secondary',
+                          fontWeight: 500,
                         }}
                       />
                     </Box>

@@ -171,13 +171,13 @@ function EventDetail() {
               <Box
                 sx={{
                   height: 300,
-                  background: 'linear-gradient(135deg, #42a5f5 0%, #1976d2 100%)',
+                  background: '#e5e7eb',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Event sx={{ fontSize: 120, color: 'white' }} />
+                <Event sx={{ fontSize: 84, color: '#6b7280' }} />
               </Box>
               <CardContent sx={{ p: 4 }}>
                 <Typography variant="h3" fontWeight={700} gutterBottom>
@@ -311,10 +311,8 @@ function EventDetail() {
                   disabled={processing}
                   sx={{
                     py: 1.5,
-                    borderRadius: 2,
-                    fontWeight: 600,
-                    bgcolor: 'secondary.main',
-                    '&:hover': { bgcolor: 'secondary.dark' },
+                    borderRadius: 1,
+                    fontWeight: 500,
                   }}
                 >
                   {processing ? 'Processando...' : 'Comprar Ingressos'}

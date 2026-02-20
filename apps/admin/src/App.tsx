@@ -31,7 +31,6 @@ import {
   ShoppingBag,
   People,
   Logout,
-  Menu as MenuIcon,
 } from '@mui/icons-material';
 import Login from './pages/Login';
 import DashboardPage from './pages/Dashboard';
@@ -76,7 +75,7 @@ function AppContent() {
   ];
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f5f7fa' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f3f4f6' }}>
       <AppBar
         position="fixed"
         sx={{
@@ -149,10 +148,10 @@ function AppContent() {
                 sx={{
                   mx: 1,
                   mb: 0.5,
-                  borderRadius: 2,
+                  borderRadius: 1,
                   '&:hover': {
-                    bgcolor: 'primary.light',
-                    color: 'primary.dark',
+                    bgcolor: '#e5e7eb',
+                    color: 'text.primary',
                   },
                   '&.Mui-selected': {
                     bgcolor: 'primary.main',

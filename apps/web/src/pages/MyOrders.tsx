@@ -250,13 +250,9 @@ function MyOrders() {
       <Box sx={{ mb: 4 }}>
         <Typography
           variant="h4"
-          fontWeight={700}
+          fontWeight={600}
           gutterBottom
-          sx={{
-            background: 'linear-gradient(135deg, #42a5f5 0%, #1976d2 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-          }}
+          sx={{ color: 'text.primary' }}
         >
           Meus Pedidos
         </Typography>
@@ -299,11 +295,10 @@ function MyOrders() {
                     elevation={0}
                     sx={{
                       borderRadius: 3,
-                      border: '1px solid #e0e0e0',
-                      transition: 'all 0.3s ease',
+                      border: '1px solid #e5e7eb',
+                      transition: 'border-color 0.2s ease',
                       '&:hover': {
-                        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                        transform: 'translateY(-2px)',
+                        borderColor: '#cbd5e1',
                       },
                     }}
                   >

@@ -7,7 +7,7 @@
 
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { useAuth, AuthProvider } from './hooks/useAuth';
-import { AppBar, Toolbar, Button, Container, Box, Typography, Avatar, Menu, MenuItem, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Button, Container, Box, Typography, Menu, MenuItem, IconButton } from '@mui/material';
 import { Event, Person, ShoppingBag, Logout } from '@mui/icons-material';
 import Home from './pages/Home';
 import EventDetail from './pages/EventDetail';
@@ -36,7 +36,7 @@ function AppContent() {
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#f5f7fa' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: '#f3f4f6' }}>
       <AppBar 
         position="sticky" 
         elevation={0}
@@ -55,12 +55,9 @@ function AppContent() {
                 component={Link}
                 to="/"
                 sx={{
-                  fontWeight: 700,
-                  color: 'primary.main',
+                  fontWeight: 600,
+                  color: 'text.primary',
                   textDecoration: 'none',
-                  background: 'linear-gradient(135deg, #42a5f5 0%, #1976d2 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
                 }}
               >
                 BilheteriaTech
